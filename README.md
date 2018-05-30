@@ -25,9 +25,10 @@ chosen (line 16) and is sent to the environment. Based on the point selected and
 ## Results
 
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hyper_ellipsoid.png)
-<b>Figure 1: Results of the bandit algorithm while reward function = 500 - Σi(xᵢ-i)² where sigma is from 1 to 10.<\b>
+*Figure 1: Results of the bandit algorithm while the **reward function = 500 - Σi(xᵢ-i)² where Σ is from 1 to 10.** Hence X-space is 10 dimensional while each dimension's range is [-60,60].* 
+
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hyper_ellipsoid.jpg)
-<b>Figure 2: Most rewarding point in the 10-dimensional X-space where each dimension's range was [-60,60]. Notice that the global maxima is 500 when x = (1,2,3,4,5,6,7,8,9,10) which the bandit approximated well in 3000 rounds. <\b>    
+*Figure 2: Most rewarding point in the 10-dimensional X-space where each dimension's range was [-60,60]. Notice that the global maxima is 500 when x = (1,2,3,4,5,6,7,8,9,10) which the bandit approximated well in 3000 rounds.*  
 
 
 ## Sample Code
