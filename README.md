@@ -36,7 +36,7 @@ chosen (line 16) and is sent to the environment. Based on the point selected and
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/sixhumpcamelback.png)
 *Figure 4: Results of the bandit algorithm where the **reward function = -six_hump_camelback function.** The dimensions were constrained to be [-2,2] and [-1,1] as in Figure 3.*
 
-![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/sixhump.jpg)
+![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/six_hump.jpg)
 *Figure 5: The last selected arm is the most rewarding point in the 2-dimensional X-space that is discovered so far. Even though the bandit has not yet discovered the global maximum, it is has gotten very close to it in 4000 rounds.*
 
 ## Sample Code
