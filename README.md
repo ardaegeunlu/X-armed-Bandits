@@ -77,4 +77,5 @@ Even though the bandit has not yet discovered the global maximum, it is has gott
     rewards = testFunction.drawn_values
     best = testFunction.bests
 ```
-¹² S. Bubeck, R. Munos, G Stoltz, and C. Szepesvari. X-armed Bandits. Journal of Machine Learning Research 12 (2011) 1655-1695, 2011.
+## References
+¹ ² S. Bubeck, R. Munos, G Stoltz, and C. Szepesvari. X-armed Bandits. Journal of Machine Learning Research 12 (2011) 1655-1695, 2011.
