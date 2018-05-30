@@ -18,7 +18,7 @@ of the number of times a node was traversed up to round n and the corresponding 
 far. Based on these, HOO assigns an optimistic estimate (denoted by B) to the maximum mean-payoff associated with each node.
 These estimates are then used to select the next node to “play”. This is done by traversing the tree, beginning from the root,
 and always following the node with the highest B-value. Once a node is selected, a point in the region associated with it is
-chosen (line 16) and is sent to the environment. Based on the point selected and the received reward, the tree is updated.²
+chosen and is sent to the environment. Based on the point selected and the received reward, the tree is updated.²
 
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hoo_tree.jpg)
 
