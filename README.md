@@ -44,7 +44,7 @@ The dimensions were constrained to be [-2,2] and [-1,1] as in Figure 3.*
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/six_hump.jpg)
 
 *Figure 5: The last selected arm is the most rewarding point in the 2-dimensional X-space that is discovered so far.
-Even though the bandit has not yet discovered the global maximum, it is has gotten very close to it in 4000 rounds.*
+Even though the bandit has not yet discovered the global maximum, it has gotten very close to it in 4000 rounds.*
 
 ## Sample Code
 
