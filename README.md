@@ -49,6 +49,11 @@ Even though the bandit has not yet discovered the global maximum, it is has gott
 ## Sample Code
 
 ```python
+
+import Partitioner
+import TestFunctions
+import HOO
+
     # choose a test function.
     testFunction = TestFunctions.TestFunctions(functionName="hyper_ellipsoid", dimensions=10)
     # testFunction = TestFunctions.TestFunctions(functionName="analytical_g", g_params=np.array([0.1, 0.3, 1, 3, 10, 30, 90, 300]))
