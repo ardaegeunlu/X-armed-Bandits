@@ -1,5 +1,6 @@
 # X-armed-Bandits
 
+# Introduction
 We consider a generalization of stochastic bandits where the set of arms, X, is allowed to be a generic measurable space and
 the mean-payoff function is “locally Lipschitz” with respect to a dissimilarity function that is known to the decision maker.
 Under this condition we construct an arm selection policy, called HOO (hierarchical optimistic optimization), with improved
@@ -21,4 +22,38 @@ chosen (line 16) and is sent to the environment. Based on the point selected and
 
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hoo_tree.jpg)
 
+# Results 
+
+
+# Sample Code
+
+```python
+# choose a test function.
+    testFunction = TestFunctions.TestFunctions(functionName="hyper_ellipsoid", dimensions=10)
+    # testFunction = TestFunctions.TestFunctions(functionName="analytical_g", g_params=np.array([0.1, 0.3, 1, 3, 10, 30, 90, 300]))
+    # testFunction = TestFunctions.TestFunctions(functionName="SixHumpCamelback")
+
+    #  get the min and max bounds of the domain of the test function.
+    bounds = testFunction.get_bounds()
+
+    # initialize a partitioner that will generate the tree covering sequence from the space-X defined by the above "bounds."
+    partitioner = Partitioner.Partitioner(min_values=bounds[0], max_values=bounds[1])
+
+    # initialize the bandit algorithm with the following.
+    # ro = 0.5 is generally a good choice, for symmetric or near-symmetric X-spaces.
+    #  a good choice of v1 would be >= dimensions*6 for "hyper_ellipsoid function",
+    # and >= 6 for "analytical_g" and "sixhumpcamelback"
+
+    x_armed_bandit = HOO.HOO(v1=60, ro=0.5, covering_generator_function=partitioner.halve_one_by_one)
+    x_armed_bandit.set_time_horizon(max_plays=1000)
+    x_armed_bandit.set_environment(environment_function=testFunction.draw_value)
+    x_armed_bandit.run_hoo()
+
+    # this is the most rewarding point explored so far after "max_plays" rounds.
+    print ("last selected arm was: {0}".format(x_armed_bandit.last_arm))
+
+    # the rewards that are received by the bandit should be stored by the environment, as well as the best-fixed strategy.
+    rewards = testFunction.drawn_values
+    best = testFunction.bests
+```
 ¹² S. Bubeck, R. Munos, G Stoltz, and C. Szepesvari. X-armed Bandits. Journal of Machine Learning Research 12 (2011) 1655-1695, 2011.
