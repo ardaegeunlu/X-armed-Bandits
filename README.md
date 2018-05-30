@@ -1,6 +1,6 @@
 # X-armed-Bandits
 
-# Introduction
+## Introduction
 We consider a generalization of stochastic bandits where the set of arms, X, is allowed to be a generic measurable space and
 the mean-payoff function is “locally Lipschitz” with respect to a dissimilarity function that is known to the decision maker.
 Under this condition we construct an arm selection policy, called HOO (hierarchical optimistic optimization), with improved
@@ -22,10 +22,10 @@ chosen (line 16) and is sent to the environment. Based on the point selected and
 
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hoo_tree.jpg)
 
-# Results 
+## Results 
 
 
-# Sample Code
+## Sample Code
 
 ```python
 # choose a test function.
