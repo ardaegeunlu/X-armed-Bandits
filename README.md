@@ -19,5 +19,6 @@ These estimates are then used to select the next node to “play”. This is don
 and always following the node with the highest B-value. Once a node is selected, a point in the region associated with it is
 chosen (line 16) and is sent to the environment. Based on the point selected and the received reward, the tree is updated.²
 
+![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hoo_tree.png)
 
 ¹² S. Bubeck, R. Munos, G Stoltz, and C. Szepesvari. X-armed Bandits. Journal of Machine Learning Research 12 (2011) 1655-1695, 2011.
