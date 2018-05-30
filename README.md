@@ -25,11 +25,19 @@ chosen (line 16) and is sent to the environment. Based on the point selected and
 ## Results
 
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hyper_ellipsoid.png)
-*Figure 1: Results of the bandit algorithm while the **reward function = 500 - Σi(xᵢ-i)² where Σ is from 1 to 10.** Hence X-space is 10 dimensional while each dimension's range is [-60,60].* 
+*Figure 1: Results of the bandit algorithm where the **reward function = 500 - Σi(xᵢ-i)² where Σ is from 1 to 10.** Hence X-space is 10 dimensional while each dimension's range is [-60,60].* 
 
 ![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/hyper_ellipsoid.jpg)
-*Figure 2: Most rewarding point in the 10-dimensional X-space where each dimension's range was [-60,60]. Notice that the global maxima is 500 when x = (1,2,3,4,5,6,7,8,9,10) which the bandit approximated well in 3000 rounds.*  
+*Figure 2: The last selected arm is the most rewarding point in the 10-dimensional X-space that is discovered so far. Each dimension's range was [-60,60]. Notice that the global maxima is 500 when x = (1,2,3,4,5,6,7,8,9,10) which the bandit approximated well in 3000 rounds.*
 
+![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/camel6.png)
+*Figure 3: Six-hump camelback function. A widely used global optimization function. It has two global minumum at (x1,x2) =(-0.0898,0.7126), (0.0898,-0.7126), and multiple local minima.*
+
+![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/sixhumpcamelback.png)
+*Figure 4: Results of the bandit algorithm where the **reward function = -six_hump_camelback function.** The dimensions were constrained to be [-2,2] and [-1,1] as in Figure 3.*
+
+![alt text](https://raw.githubusercontent.com/ardaegeunlu/X-armed-Bandits/master/Figures/sixhump.jpg)
+*Figure 5: The last selected arm is the most rewarding point in the 2-dimensional X-space that is discovered so far. Even though the bandit has not yet discovered the global maximum, it is has gotten very close to it in 4000 rounds.*
 
 ## Sample Code
 
