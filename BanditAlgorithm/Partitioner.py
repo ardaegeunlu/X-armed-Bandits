@@ -1,172 +1,87 @@
 # -*- coding: utf-8 -*-
 
-import TreeNode
-import random
 import math
+import numpy as np
 
 """
-    This class is built around the ideas that are thoroughly explained in the paper
-    "X-armed Bandits" by Bubeck et al., 2011.
+    This class is designed with the intent that it can be used as the default tree_coverings_generator for
+    the HOO algorithm.
 """
 
 
-class HOO(object):
-    """
-    The hierarchical optimistic optimization algorithm.
-    """
+class Covering(object):
 
-    def __init__(self, v1, ro, covering_generator_function):
+    def __init__(self, lowers, uppers):
         """
-        :param v1: v1 must be > 0. the diameter of all tree coverings must less than v1*ro^h where h
-        is the depth of the node with given covering.
-        :param ro: ro must be in (0,1) exclusively. the diameter of all tree coverings must less than v1*ro^h where h
-        is the depth of the node with given covering.
-        :param covering_generator_function: this function generates a subspace of space X,
-        by taking the height(h) and the order-in-the-level(i) of a binary tree node. (For instance a root node
-        has h = 0 and i = 1, its children would have h = 1, and i = 1 and i = 2 from left to right.) This func. must
-        return an object with two properties, namely "upper" & "lower" which define the boundaries of the subset.
+        :param lowers: lower bounds of the subset(covering) of the generic measurable space-X.
+        :param uppers: upper bounds of the subset(covering) of the generic measurable space-X.
         """
-        # ro needs to be between 0 and 1 exclusively.
-        if 0 >= ro:
-            ro = 0.001
-        elif ro >= 1:
-            ro = 0.999
+        self.upper = uppers
+        self.lower = lowers
 
-        self.ro = ro
-        self.v1 = v1
-        self.tree_coverings = covering_generator_function
-        self.tree = TreeNode.TreeNode() # this is the root
-        self.create_children_of_node(self.tree) # create first two leafs with infinite B values
-        self.last_arm = None
 
-    def set_time_horizon(self, max_plays):
+class Partitioner(object):
+
+    def __init__(self, min_values, max_values, **keyword_parameters):
         """
-        :param max_plays: maximum number of rounds.
+        :param min_values: the minimum values of the domain of the environment(reward) function.
+        :param max_values: the maximum values of the domain of the environment(reward) function.
+        :param keyword_parameters: 'partitioning_priorities' is the only available optional argument,
+        and when it is not provided no dimension has a priority over the order and at each level a different
+        dimension is partitioned, but if there were a total of 3 dimensions in the X-space and the 'partitioning policy'
+        was set to [2,0,1] then the partitioner partitions the zeroth dimension twice, leaves first dimension as it is,
+        then partitions second dimension once, and repeats.
+        so the default behaviour is as if the priorities is set to [1,1,...,1].
         """
-        self.max_plays = max_plays
+        self.covering_sequence = {}
+        search_space = Covering(lowers=np.array(min_values, dtype=float), uppers=np.array(max_values, dtype=float))
+        self.dimensions = np.size(min_values)
+        self.covering_sequence[0,1] = search_space  # the root is the entire space X.
 
-    def set_environment(self, environment_function):
+        # NOTE that this is an experimental input that is not in the original paper but meant as an improvement.
+        if 'partitioning_priorities' in keyword_parameters:
+            self.priority_array = keyword_parameters['partitioning_priorities']
+        else:
+            self.priority_array = np.ones(self.dimensions)
+
+    def halve_one_by_one(self, height, place_in_level):
         """
-        :param environment_function: environment function must take a vector as a parameter that is of size that is
-        specified to covering_generator_function, and return a scalar as reward(positive) and loss(negative).
+        :param height: height of the node.
+        :param place_in_level: order in the level of the node.
+        :return: a subset of X.
         """
-        self.environment_function = environment_function
 
-    def create_children_of_node(self, node):
-        """
-        :param node: parent node.
-        """
-        node.activated = True
+        dimension_to_be_partitioned = 0  # we need to find out which dimension we need to partition.
+        # if priorities are not explicitly defined this just equals self.dimensions.
+        priority_height = np.sum(self.priority_array)
+        # example: if we are at height = 7 and have 3 dimensions with equal priority in X, we should partition
+        # the dimension (7-1) % 3 = 0.
+        effective_height = height % priority_height
+        cumulative_priorities = np.cumsum(self.priority_array)
 
-        node.left = TreeNode.TreeNode()
-        node.left.B_value = float("inf")
+        while effective_height >= cumulative_priorities[dimension_to_be_partitioned]:
+            dimension_to_be_partitioned += 1
 
-        node.right = TreeNode.TreeNode()
-        node.right.B_value = float("inf")
+        parent_h = height - 1
+        parent_i = (place_in_level + 1) / 2
+        parent_space = self.covering_sequence[parent_h, parent_i]
+        #print("index = {0},{1} and parent = {2},{3}".format(height,place_in_level,parent_h,parent_i))
+        # partition the dimension_to_be_partitioned into half.
+        newSpace = Covering(lowers=np.copy(parent_space.lower), uppers=np.copy(parent_space.upper))
+        midValue = (parent_space.lower[dimension_to_be_partitioned] + parent_space.upper[
+            dimension_to_be_partitioned]) / 2.0
 
-    def selection_of_arm_from_covering(self, h, i):
-        """
-        :param h: chosen node's height.
-        :param i: chosen node's order in the level.
-        :return: received reward.
-        """
-        subset_space = self.tree_coverings(h, i)
-        # now we need to arbitrarily select one arm from this subset of the space.
-        # the chosen strategy is selecting the midpoint of the subset but this can
-        # be further modified.
-        selected_arm = (1.0*subset_space.upper + subset_space.lower) / 2.0
-        #print("selected arm = {0}".format(selected_arm))
-        self.last_arm = selected_arm
-        reward = self.environment_function(selected_arm)
-        return reward
+        # left child of parent, left portion of the parent's subspace.
+        if place_in_level % 2 == 1:
+            newSpace.upper[dimension_to_be_partitioned] = midValue
+        # right child of parent, right portion of the parent's subspace.
+        else:
+            newSpace.lower[dimension_to_be_partitioned] = midValue
 
-    def recursively_update_tree_U_values(self, node, round, height):
-        """
-        :param node: current node.
-        :param round: round t.
-        :param height: current height.
-        :return: None
-        """
-        if not node.activated:
-            return
+        #print("partitioning dimension = {0} and midvalue = {1}".format(dimension_to_be_partitioned,midValue))
+        #print("parent was \nlower={0}\nupper={1}".format(parent_space.lower, parent_space.upper))
+        #print("added element with\nlower={0}\nupper={1}".format(newSpace.lower, newSpace.upper))
 
-        node.U_value = node.mean + math.sqrt( 2.0* math.log(round) / node.counter) + self.v1*(self.ro**height)
-        self.recursively_update_tree_U_values(node.left, round, height+1)
-        self.recursively_update_tree_U_values(node.right, round, height+1)
-        return
+        self.covering_sequence[height, place_in_level] = newSpace
 
-    def recursively_copy_active_nodes(self, node, copy_list):
-        """
-        :param node: current node.
-        :param copy_list: the list where all nodes are copied to via a post-order traversal.
-        """
-        # we do a post-order traversal because leafs should be added first to the list
-        if not node.activated:
-            return
-        self.recursively_copy_active_nodes(node.left, copy_list)
-        self.recursively_copy_active_nodes(node.right, copy_list)
-        copy_list.append(node)
-
-    def run_hoo(self):
-        """
-        run the agent for "max_plays" rounds.
-        """
-        for round in range(1, self.max_plays):
-
-            traversed_path = []
-            current_node_depth = 0;
-            current_node_in_level = 1;
-            current_node = self.tree
-            traversed_path.append(current_node)
-
-            # traverse down the tree to find the leaf with highest B value.
-            while current_node.activated:
-
-                if current_node.left.B_value > current_node.right.B_value:
-                    current_node = current_node.left
-                    current_node_in_level = current_node_in_level * 2
-
-                elif current_node.left.B_value < current_node.right.B_value:
-                    current_node = current_node.right
-                    current_node_in_level = current_node_in_level * 2 - 1
-
-                else:
-                    # tie breaking rule here is defined as choosing a child at random
-                    rand = random.uniform(0,1)
-
-                    if rand > 0.5:
-                        current_node = current_node.left
-                        current_node_in_level = current_node_in_level * 2
-
-                    else:
-                        current_node = current_node.right
-                        current_node_in_level = current_node_in_level*2 - 1
-
-                # append to traversed path and update height as well as order in level
-                current_node_depth += 1
-                traversed_path.append(current_node)
-
-            # now we have selected the most promising child from the tree we had,
-            # we can draw an arm in X from the coverings
-            reward = self.selection_of_arm_from_covering(current_node_depth, current_node_in_level)
-            self.create_children_of_node(current_node)
-
-            # update counter values and means in the traversed path
-            for node in traversed_path:
-                node.counter += 1
-                node.mean = (1.0 - 1.0/node.counter) * node.mean + reward*1.0/node.counter
-
-            self.recursively_update_tree_U_values(node=self.tree, round=round, height=0)
-            tree_copy = []
-            self.recursively_copy_active_nodes(node=self.tree, copy_list=tree_copy)
-
-            # backward computation to update all the B_values.
-            while tree_copy.__len__() > 1:
-                node = tree_copy.pop(0)
-                node.B_value = min(node.U_value, max(node.left.B_value, node.right.B_value))
-
-            if round % 100 == 0:
-                print ("@round {0}".format(round))
-
-        print("done!")
-        return
+        return newSpace
