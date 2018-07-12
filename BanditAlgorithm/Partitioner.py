@@ -63,7 +63,7 @@ class Partitioner(object):
             dimension_to_be_partitioned += 1
 
         parent_h = height - 1
-        parent_i = (place_in_level + 1) / 2
+        parent_i = (place_in_level + 1) // 2
         parent_space = self.covering_sequence[parent_h, parent_i]
         #print("index = {0},{1} and parent = {2},{3}".format(height,place_in_level,parent_h,parent_i))
         # partition the dimension_to_be_partitioned into half.
